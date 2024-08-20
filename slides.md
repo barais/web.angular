@@ -135,7 +135,8 @@ layout: two-cols-header
 
 
 ---
-## jQuery
+
+# jQuery
 - Simplifies event binding and DOM manipulation
 - Common API across multiple browsers
 - Supports plug-in modules to extend functionality
