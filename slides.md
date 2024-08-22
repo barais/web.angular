@@ -508,7 +508,6 @@ onerror='handleError(event)'>
   -- Information about the angular application parts
 - **Component interaction**
   -- Information about the angular application parts
-- **Signals**
 
 
 ---
@@ -541,9 +540,10 @@ onerror='handleError(event)'>
   - magic link between business model and template
 - **Metadata**
   -- Information about the angular application parts
+- **Signals**
+  - Signal, effect and reactive programming
 - **Component interaction**
   - Information about the angular application parts
-- **Signals**
 
 
 ---
@@ -781,6 +781,104 @@ Angular inserts an instance of the HeroListComponent view between tags.
 </p>
 
 
+
+
+---
+
+# Signals 
+
+>  **Angular Signals** is a system that granularly tracks how and where your state is used throughout an application, allowing the framework to optimize rendering updates.
+
+A signal is a wrapper around a value that notifies interested consumers when that value changes. 
+
+Signals can contain any value, from primitives to complex data structures.
+
+---
+
+# Writable signals
+
+Writable signals provide an API for updating their values directly. You create writable signals by calling the signal function with the signal's initial value:
+
+```ts
+const count = signal(0);
+// Signals are getter functions - calling them reads their value.
+console.log('The count is: ' + count());
+```
+
+To change the value of a writable signal, either .set() it directly:
+
+```ts
+count.set(3);
+```
+
+or use the .update() operation to compute a new value from the previous one:
+
+```ts
+// Increment the count by 1.
+count.update(value => value + 1);
+```
+
+---
+
+# Computed signals
+
+**Computed signal** are read-only signals that derive their value from other signals. You define computed signals using the computed function and specifying a derivation:
+
+```ts
+const count: WritableSignal<number> = signal(0);
+const doubleCount: Signal<number> = computed(() => count() * 2);
+```
+
+The doubleCount signal depends on the count signal. Whenever count updates, Angular knows that doubleCount needs to update as well.
+
+- Computed signals are both lazily evaluated and memoized
+- Computed signals are not writable signals
+
+---
+
+# Signals and template
+
+When you use a signal within a template interpolation, you need to invoke it to render its value.
+
+```ts
+import {Component, signal, Signal} from '@angular/core';
+
+@Component({
+  // …
+})
+class MyComponent {
+    mySignal: Signal = signal(0)
+}
+```
+
+```html
+<div>{{ mySignal() }}/div>
+```
+
+---
+
+# Effects
+
+Signals are useful because they notify interested consumers when they change. An effect is an operation that runs whenever one or more signal values change. You can create an effect with the effect function:
+
+```ts
+effect(() => {
+  console.log(`The current count is: ${count()}`);
+});
+```
+
+---
+
+# Signals summary
+
+Signals are:
+
+- Not a Replacement for RxJS or Observables for async operations such as http.get
+- Reactive in Nature
+- Always have a value
+- Synchronous
+
+Can be used in Components, Services, Templates, or Directives
 
 
 ---
@@ -1334,30 +1432,24 @@ export class HeroAsyncMessageComponent {
 
 
 ---
+layout: center
+---
+
+# Modules VS Standalone components
+
+
+---
+layout: two-cols-header
+---
 
 # Modules
 
-app/app.component.ts:
 
-```ts
-export class AppComponent { }
-```
+> Angular defines modules as containers for a cohesive block of code dedicated to an application domain, a workflow, or a closely related set of capabilities. They can contain components, service providers, and other code files whose scope is defined by the containing module. They can import functionality that is exported from other modules, and export selected functionality for use by other modules.
 
-app/boot.ts:
-
-```ts
-import {AppComponent} from './app.component';
-```
 
 > equivalent to decide which classes can be imported from a jar (Public Private for a module)
 
-<p class="current-visible"
-style="position:absolute; left:670px; top:130px;">
-<img src="/angular2/img2.png" width="100%"></p>
-
----
-
-# Library modules
 
 ```ts
 import {Component} from '@angular/core';
@@ -1367,6 +1459,77 @@ import {Component} from '@angular/core';
 - Modules export things — classes, function, values — that other modules import.
 - We prefer to write our application as a collection of modules, each module exporting one thing.
 
+
+```ts
+@NgModule({
+  imports: [BrowserModule, RouterModule],
+  declarations: [AppComponent],
+  bootstrap: [AppComponent],
+})
+export class AppModule {}
+```
+
 <p class="current-visible"
-style="position:absolute; left:300px; top:250px;">
-<img src="/angular2/img3.png" width="100%"></p>
+style="position:absolute; left:600px; top:350px;">
+<img src="/angular2/img3.png" width="70%"></p>
+
+---
+layout: two-cols-header
+---
+
+
+# Standalone component
+
+- Introduced in Angular 15
+- eliminate the requirement for modules.
+
+
+::left::
+
+With modules
+
+<Transform :scale="0.9">
+```ts
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrl: './app.component.scss',
+})
+export class AppComponent {}
+```
+
+</Transform>
+
+
+
+::right::
+
+With standelone component
+
+<Transform :scale="0.9">
+```ts
+@Component({
+    selector: 'app-root',
+    standalone: true,
+    imports: [RouterOutlet],
+    templateUrl: './app.component.html',
+    styleUrl: './app.component.scss',
+})
+export class AppComponent {}
+```
+</Transform>
+
+<v-clicks>
+
+- Reduced bundle size and improved build times
+- Enhanced lazy loading and routing capabilities
+</v-clicks>
+
+<v-after>
+```ts
+export const ROUTES: Route[] = [
+  {path: 'foo', loadComponent: () => 
+     import('./foo/bar.component').then(mod => mod.BarComponent)},
+];
+```
+</v-after>
