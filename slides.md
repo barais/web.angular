@@ -687,9 +687,130 @@ app/hero-list.component.html
 style="position:absolute; left:650px; top:-70px;">
 <img src="/angular2/img5.png" width="100%"></p>
 
-| foo | bar |
-| --- | --- |
-| <div><p>1</p>cdc</div> | test2 |
+
+
+---
+layout: two-cols-header
+---
+
+
+# New control-flow template syntax (Angular 17)
+
+::left::
+
+<Transform :scale="0.95">
+
+```html
+<ng-container *ngIf="cond.expr; else elseBlock">
+  Main case was true!
+</ng-container>
+
+<ng-template #elseBlock>
+  <ng-container *ngIf="other.expr; else finalElseBlock">
+    Extra case was true!
+  </ng-container>
+
+</ng-template>
+<ng-template #finalElseBlock>
+  False case!
+</ng-template>
+```
+
+</Transform>
+
+
+::right::
+
+
+<Transform :scale="0.95">
+
+```html
+@if (cond.expr) 
+{
+  Main case was true!
+} 
+@else if (other.expr) 
+{
+  Extra case was true!
+} 
+@else 
+{
+  False case!
+}
+```
+
+</Transform>
+
+
+---
+layout: two-cols-header
+---
+
+# New control-flow template syntax (Angular 17)
+
+::left::
+
+<Transform :scale="0.95">
+```ts
+trackByFunction(index, item) {
+  return item.id;
+}
+```
+
+```html
+<div *ngFor="let item of items; index as idx; trackBy: trackByFunction">
+  Item #{{ idx }}: {{ item.name }}
+</div>
+```
+</Transform>
+
+::right::
+
+<Transform :scale="0.95">
+```html
+@for (item of items; track item.id; 
+    let idx = $index, let e = $even) 
+{
+  Item #{{ idx }}: {{ item.name }}
+}
+@empty 
+{
+  There were no items in the list.
+}
+```
+</Transform>
+
+
+---
+layout: two-cols-header
+---
+
+
+# New control-flow template syntax (Angular 17)
+
+
+
+
+<Transform :scale="0.95">
+```html
+@switch (condition) 
+{
+  @case (caseA) 
+  {
+    Case A.
+  }
+  @case (caseB) 
+  {
+    Case B.
+  }
+  @default 
+  {
+    Default case.
+  }
+}
+```
+</Transform>
+
 
 ---
 
